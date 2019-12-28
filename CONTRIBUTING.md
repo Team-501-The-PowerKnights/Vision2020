@@ -9,7 +9,6 @@ If you are a member of the team you have full push access to the repo. This mean
 1. Make an issue 
     * Clear description of what your trying to solve
     * Assigned to your self or another member
-    * Set @ionigman and @dither as reviewers
     * Add tags that align with the goal of the issue
 2. Make a branch with a name that clearly defines what feature you are trying to add/bug you are trying to fix
 3. Commit you changes to that branch
