@@ -1,0 +1,15 @@
+[os]
+operating_system = linux
+[camera]
+camera_device = "http://localhost:1180/?action=stream?dummy=param.mjpg"
+[mask]
+green_upper = 85,255,227
+green_lower = 73,129,83
+[framerate]
+nt_update_frequency = 2
+[debug]
+debug = 0
+[search]
+search = 1
+[robot]
+address = roborio-501-frc.local
