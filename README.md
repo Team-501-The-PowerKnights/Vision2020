@@ -1,5 +1,5 @@
 # Vision2020
-2020 FRC Vision Project
+2020 FRC Vision Application
 
 # Contributing
 
