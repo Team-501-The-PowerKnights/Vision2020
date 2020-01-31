@@ -36,6 +36,7 @@ def drawLine2Target(img, cx, cy):
     img_line = cv2.line(img, (centery, centerx), (cx, cy), (255, 0, 0), 2)
     return img_line
 
+
 def drawCrossHairs(img):
     """
     Draws cross-hairs in image donating the center of the camera view
@@ -56,8 +57,12 @@ def drawCrossHairs(img):
     centerymin10 = centery - 10
     centerymin30 = centery - 30
     red = (0, 0, 255)
-    top_hair = cv2.line(img, (centerx, centerymin10), (centerx, centerymin30), red, 2)
-    bottom_hair = cv2.line(top_hair, (centerx, centery10), (centerx, centery30), red, 2)
-    left_hair = cv2.line(bottom_hair, (centerxmin10, centery), (centerxmin30, centery), red, 2)
-    crosshairs = cv2.line(left_hair, (centerx10, centery), (centerx30, centery), red, 2)
+    top_hair = cv2.line(img, (centerx, centerymin10),
+                        (centerx, centerymin30), red, 2)
+    bottom_hair = cv2.line(top_hair, (centerx, centery10),
+                           (centerx, centery30), red, 2)
+    left_hair = cv2.line(bottom_hair, (centerxmin10, centery),
+                         (centerxmin30, centery), red, 2)
+    crosshairs = cv2.line(left_hair, (centerx10, centery),
+                          (centerx30, centery), red, 2)
     return crosshairs

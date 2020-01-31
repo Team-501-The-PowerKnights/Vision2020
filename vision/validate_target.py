@@ -4,6 +4,7 @@ import image_calculations as IC
 from heapq import nlargest
 import manipulate_image as MI
 
+
 def isValidShape(contour, rect_cnt, rect_cnt2):
     """
     Use cv2.matchShapes to see if the contour is close enough to the shape we are looking for
@@ -19,6 +20,7 @@ def isValidShape(contour, rect_cnt, rect_cnt2):
         return True
     else:
         return False
+
 
 def sortArray(sorted_indices, array):
     """
@@ -48,7 +50,8 @@ def find_valid_target(mask, rect_cnt1, rect_cnt2):
     # initialize variables
     numContours = 10
     # find contours
-    contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv2.findContours(
+        mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     # take 10 longest contours
     biggestContours = nlargest(numContours, contours, key=len)
     # get area of each contour
@@ -59,8 +62,10 @@ def find_valid_target(mask, rect_cnt1, rect_cnt2):
             areas.append(cv2.contourArea(cnt))
         sorted_indices = np.argsort(areas)
         max_index = np.where(sorted_indices == len(sorted_indices) - 1)[0][0]
-        second_index = np.where(sorted_indices == len(sorted_indices) - 2)[0][0]
-        biggestContours = [biggestContours[max_index], biggestContours[second_index]]
+        second_index = np.where(
+            sorted_indices == len(sorted_indices) - 2)[0][0]
+        biggestContours = [biggestContours[max_index],
+                           biggestContours[second_index]]
         # check validity of contours by shape match
         for contour in biggestContours:
             if isValidShape(contour, rect_cnt1, rect_cnt2):

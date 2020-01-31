@@ -12,7 +12,8 @@ import numpy as np
 logging.basicConfig(level=logging.DEBUG)
 
 # the parameters passed into run_config are the configuration and the filename.
-os, camera_location, calibration, freqFramesNT, address = run_config(None, None)
+os, camera_location, calibration, freqFramesNT, address = run_config(
+    None, None)
 
 
 def main():
@@ -32,12 +33,14 @@ def nt_init(robot_address):
     while not bot_address_found:
         try:
             robot_ip = None
-            robot_ip = socket.gethostbyname(robot_address)  # determine robot IP
+            robot_ip = socket.gethostbyname(
+                robot_address)  # determine robot IP
             if robot_ip is not None:
                 print("INFO: Found robot at " + robot_ip)
                 bot_address_found = True
         except socket.gaierror:
-            print("WARNING: Unable to find robot IP Address.")  # this will loop until we find the robot
+            # this will loop until we find the robot
+            print("WARNING: Unable to find robot IP Address.")
             continue
 
     nt_init = False
@@ -86,12 +89,14 @@ def create_rect(debug):
     bottom_right_y = int(img_length + length / 2)
 
     background = np.zeros((350, 350, 3), np.uint8)
-    rect1 = cv2.rectangle(background, (top_left_x, top_left_y), (bottom_right_x, bottom_right_y), (255, 255, 255), -1)
+    rect1 = cv2.rectangle(background, (top_left_x, top_left_y),
+                          (bottom_right_x, bottom_right_y), (255, 255, 255), -1)
     m = cv2.getRotationMatrix2D((350 / 2, 350 / 2), -14.5, 1)
     rect1_rotated = cv2.warpAffine(rect1, m, (350, 350))
     ret, thresh = cv2.threshold(rect1_rotated, 127, 255, cv2.THRESH_BINARY)
     thresh = cv2.cvtColor(thresh, cv2.COLOR_BGR2GRAY)
-    contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv2.findContours(
+        thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     cnt1 = contours[0]
 
     rect2 = rect1
@@ -99,7 +104,8 @@ def create_rect(debug):
     rect2_rotated = cv2.warpAffine(rect2, m, (350, 350))
     ret, thresh = cv2.threshold(rect2_rotated, 127, 255, cv2.THRESH_BINARY)
     thresh = cv2.cvtColor(thresh, cv2.COLOR_BGR2GRAY)
-    contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv2.findContours(
+        thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     cnt2 = contours[0]
     if debug:
         elapsed = timer_rect.get()
@@ -157,13 +163,15 @@ def run(cap, camera_table, calibration, freqFramesNT, rect_cnt1, rect_cnt2):
         if ret:
             try:
                 if calibration['debug']:
-                    timer_fv=SW('FV')
+                    timer_fv = SW('FV')
                     timer_fv.start()
-                angle, valid_update = FT.find_valids(frame, calibration, rect_cnt1, rect_cnt2)
+                angle, valid_update = FT.find_valids(
+                    frame, calibration, rect_cnt1, rect_cnt2)
                 if calibration['debug']:
                     elapsed = timer_fv.get()
                     print("DEBUG: find_valids took " + str(elapsed))
-                    print("DEBUG: angle: " + str(angle) + " valid_update: " + str(valid_update) + " valid_count: " + str(valid_count) )
+                    print("DEBUG: angle: " + str(angle) + " valid_update: " +
+                          str(valid_update) + " valid_count: " + str(valid_count))
                 if valid_update:
                     valid_count += 1
                 if n > freqFramesNT:

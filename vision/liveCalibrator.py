@@ -60,7 +60,7 @@ def init_window(calibration):
 
     # create switch for ON/OFF functionality
     switch = '0 : OFF \n1 : ON'
-    cv2.createTrackbar(switch, 'image',0,1,nothing)
+    cv2.createTrackbar(switch, 'image', 0, 1, nothing)
 
     return switch
 
@@ -100,9 +100,9 @@ def run(cap, switch, calibration):
             img = cv2.inRange(hsv, lower_bound, upper_bound)
         cv2.imshow('image', img)
         k = cv2.waitKey(15) & 0xFF
-        if k == 27 or k == 113: # 'q' or ESC pressed
+        if k == 27 or k == 113:  # 'q' or ESC pressed
             break
-        if k == 119: # 'w' pressed
+        if k == 119:  # 'w' pressed
             calibration['green']['green_lower'] = [str(hl), str(sl), str(vl)]
             calibration['green']['green_upper'] = [str(hh), str(sh), str(vh)]
             write_cal(calibration)

@@ -6,6 +6,8 @@ from networktables import NetworkTables as NT
 import socket
 
 # random change
+
+
 def main():
     global timer
     timer = SW('timer')
@@ -43,7 +45,8 @@ def init_nt():
 
 def init_cv():
     try:
-        cam = cv2.VideoCapture('http://tinkerboard.local:1180/?action=stream?dummy=param.mjpg')
+        cam = cv2.VideoCapture(
+            'http://tinkerboard.local:1180/?action=stream?dummy=param.mjpg')
         time.sleep(1)
         # print('camera init.')
     except:
