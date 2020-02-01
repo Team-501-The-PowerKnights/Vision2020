@@ -19,8 +19,8 @@ os, camera_location, calibration, freqFramesNT, address = run_config(
 def main():
     camera_table = nt_init(address)
     cap = cap_init(camera_location)
-    rect_cnt1, rect_cnt2 = create_rect(calibration['debug'])
-    run(cap, camera_table, calibration, freqFramesNT, rect_cnt1, rect_cnt2)
+    desired_rect = create_rect(calibration['debug'])
+    run(cap, camera_table, calibration, freqFramesNT, desired_rect)
 
 
 def nt_init(robot_address):
