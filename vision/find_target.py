@@ -7,7 +7,7 @@ import image_calculations as IC
 from datetime import datetime
 
 
-def find_valids(img_orig, calibration, rect_cnt1, rect_cnt2):
+def find_valids(img_orig, calibration, desired_cnt):
     """
     Input: image from camera, calibration information, contours from generated rectangle
     Output:
@@ -60,15 +60,14 @@ def find_valids(img_orig, calibration, rect_cnt1, rect_cnt2):
         cv2.imwrite("/home/linaro/test_images/"+time +
                     "erode_and_diliate.png", erode_and_diliate)
     if search:
-        valid, cnt, cx, cy = VT.find_valid_target(
-            mask_thresh, rect_cnt1, rect_cnt2)
+        valid, cnt = VT.find_valid_target(mask_thresh, desired_cnt)
         if valid:
             valid_update = True
+            hull = cv2.convexHull(cnt)
+            cx, cy = IC.findCenter(hull)
             if debug:
-                cx_avg = int((cx[0]+cx[1])/2)
-                cy_avg = int((cy[0]+cy[1])/2)
-                line_img = MI.drawLine2Target(mask_thresh, cx_avg, cy_avg)
+                line_img = MI.drawLine2Target(mask_thresh, cx, cy)
                 cv2.imwrite("/home/linaro/test_images/" +
                             time + "target_lined.png", line_img)
-            angle = IC.findAngle(img_orig, cx[0], cx[1])
+            angle = IC.findAngle(img_orig, cx)
     return angle, valid_update
