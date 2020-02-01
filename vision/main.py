@@ -67,9 +67,11 @@ def nt_init(robot_address):
 
 def create_rect():
     img = cv2.imread("../images/2020_target.png")
-    _, binary = cv2.threshold(img, 225, 255, cv2.THRESH_BINARY_INV)
-    contour, hierarchy = cv2.findContours(
-        binary, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    ret, thresh = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
+    thresh = cv2.cvtColor(thresh, cv2.COLOR_BGR2GRAY)
+    contour, _ = cv2.findContours(
+        thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    cv2.drawContours(img, contour, 0, (0, 255, 0), 3)
     return contour
 
 
