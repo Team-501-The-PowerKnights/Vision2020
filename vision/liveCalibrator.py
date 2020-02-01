@@ -20,6 +20,10 @@ import numpy as np
 from util.config import run_config, write_cal
 
 
+def nothing(x):
+    pass
+
+
 def init_capture(cam):
     try:
         if len(cam) == 1:
