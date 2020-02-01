@@ -108,7 +108,7 @@ def cap_init(camera_location):
     return cap
 
 
-def run(cap, camera_table, calibration, freqFramesNT, rect_cnt1, rect_cnt2):
+def run(cap, camera_table, calibration, freqFramesNT, desired_cnt):
     """
     Run the main vision algorithm on each camera frame and update network table appropriately
     :param cap: cap returned from cv2.VideoCapture
