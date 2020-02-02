@@ -35,7 +35,7 @@ def sortArray(sorted_indices, array):
     return sorted
 
 
-def find_valid_target(mask, rect_cnt1, rect_cnt2):
+def find_valid_target(mask, desired_cnt):
     """
 
     :param image: frame to be analyzed
