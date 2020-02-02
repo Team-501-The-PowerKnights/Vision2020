@@ -30,6 +30,4 @@ print("colorize: " + str(colortime))
 print("find contours: " + str(conttime))
 
 np_arr = np.array(contours[0])
-# string_cont = str(contours)
-# print(string_cont)
 print(np_arr.shape)
