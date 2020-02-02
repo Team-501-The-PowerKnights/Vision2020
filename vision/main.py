@@ -17,9 +17,10 @@ os, camera_location, calibration, freqFramesNT, address = run_config(
 
 
 def main():
-    camera_table = nt_init(address)
+    # camera_table = nt_init(address)
+    camera_table = None
     cap = cap_init(camera_location)
-    desired_rect = create_rect(calibration['debug'])
+    desired_rect = create_rect()
     run(cap, camera_table, calibration, freqFramesNT, desired_rect)
 
 
@@ -71,7 +72,7 @@ def create_rect():
     thresh = cv2.cvtColor(thresh, cv2.COLOR_BGR2GRAY)
     contour, _ = cv2.findContours(
         thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    cv2.drawContours(img, contour, 0, (0, 255, 0), 3)
+    # cv2.drawContours(img, contour, 0, (0, 255, 0), 3)
     return contour
 
 
@@ -99,12 +100,13 @@ def cap_init(camera_location):
     :param camera_location: what the camera url is
     :return: cap returned from cv2.VideoCapture
     """
-    try:
-        cap = cv2.VideoCapture(eval(camera_location))
-        time.sleep(1)
-    except:
-        print("Exception on VideoCapture init. Dying")
-        sys.exit()
+    # try:
+    #     cap = cv2.VideoCapture(eval(camera_location))
+    #     time.sleep(1)
+    # except:
+    #     print("Exception on VideoCapture init. Dying")
+    #     sys.exit()
+    cap = cv2.imread("../images/2020_target.png", 0)
     return cap
 
 
@@ -120,36 +122,42 @@ def run(cap, camera_table, calibration, freqFramesNT, desired_cnt):
     """
     valid_count = 0
     n = 0
-    while cap.isOpened():
-        ret, frame = cap.read()
+    x = 0
+    # while cap.isOpened():
+    while x < 1:
+        x += 1
+        # ret, frame = cap.read()
+        ret = True
+        frame = cap
         if ret:
-            try:
-                if calibration['debug']:
-                    timer_fv = SW('FV')
-                    timer_fv.start()
-                angle, valid_update = FT.find_valids(
-                    frame, calibration, desired_cnt)
-                if calibration['debug']:
-                    elapsed = timer_fv.get()
-                    print("DEBUG: find_valids took " + str(elapsed))
-                    print("DEBUG: angle: " + str(angle) + " valid_update: " +
-                          str(valid_update) + " valid_count: " + str(valid_count))
-                if valid_update:
-                    valid_count += 1
-                if n > freqFramesNT:
-                    nt_send(camera_table, angle, valid_count, valid_update)
-                    n = 0
-                else:
-                    n += 1
-            except:
-                print("WARNING: There was an error with find_valids. Continuing.")
-                continue
+            # try:
+            if calibration['debug']:
+                timer_fv = SW('FV')
+                timer_fv.start()
+            angle, valid_update = FT.find_valids(
+                frame, calibration, desired_cnt)
+            if valid_update:
+                valid_count += 1
+            if calibration['debug']:
+                elapsed = timer_fv.get()
+                print("DEBUG: find_valids took " + str(elapsed))
+                print("DEBUG: angle: " + str(angle) + " valid_update: " +
+                      str(valid_update) + " valid_count: " + str(valid_count))
+            if n > freqFramesNT:
+                # nt_send(camera_table, angle, valid_count, valid_update)
+                n = 0
+            else:
+                n += 1
+
+           # except:
+                #print("WARNING: There was an error with find_valids. Continuing.")
+                # continue
         else:
             print("WARNING: Unable to read frame. Continuing.")
             continue
-    else:
-        print("ERROR: Capture is not opened. Ending program.")
-        sys.exit()
+    # else:
+        #print("ERROR: Capture is not opened. Ending program.")
+        # sys.exit()
 
 
 if __name__ == "__main__":
