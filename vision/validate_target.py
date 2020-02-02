@@ -13,14 +13,20 @@ def isValidShape(contour, desired_cnt):
     :return: boolean, True if the shape match is within the allowable threshold, False otherwise
     """
     match_threshold = 2
+    timer_ft = SW('ft')
+    timer_ft.start()
     match_quality1 = cv2.matchShapes(
         desired_cnt[0], contour[0], 1, 0.0)
+    print("Mode 1 done", str(time_ft.get()))
     match_quality2 = cv2.matchShapes(
         desired_cnt[0], contour[0], 2, 0.0)
+    print("Mode 2 done", str(time_ft.get()))
     match_quality3 = cv2.matchShapes(
         desired_cnt[0], contour[0], 3, 0.0)
+    print("Mode 3 done", str(time_ft.get()))
     matches = [match_quality1, match_quality2, match_quality3]
     match_quality = min(matches)
+    print("Mode being used:", matches.index(match_quality))
     if match_quality < match_threshold:
         return True
     else:
