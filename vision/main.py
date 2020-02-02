@@ -128,7 +128,7 @@ def run(cap, camera_table, calibration, freqFramesNT, desired_cnt):
                     timer_fv = SW('FV')
                     timer_fv.start()
                 angle, valid_update = FT.find_valids(
-                    frame, calibration, rect_cnt1, rect_cnt2)
+                    frame, calibration, desired_cnt)
                 if calibration['debug']:
                     elapsed = timer_fv.get()
                     print("DEBUG: find_valids took " + str(elapsed))
