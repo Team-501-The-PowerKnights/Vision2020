@@ -5,7 +5,7 @@ from heapq import nlargest
 import manipulate_image as MI
 
 
-def isValidShape(contour, rect_cnt, rect_cnt2):
+def isValidShape(contour, desired_cnt):
     """
     Use cv2.matchShapes to see if the contour is close enough to the shape we are looking for
     :param contour: contour of potential target being analyzed
