@@ -13,19 +13,17 @@ from collections import Counter
 camera_res = [320, 240]
 
 
-def findAngle(img_orig, cx1, cx2):
+def findAngle(img_orig, cx):
     """
     Input:
         image
-        cx1 -> float center coordinate of first rectangle
-        cx2 -> float center coordinate of second rectangle
+        cx -> float center coordinate of first rectangle
     Output:
         angle -> float
 
     This function finds the robot's angle relative to the center of the target
     """
     camera_FOV = 49.6
-    cx = (cx1 + cx2) / 2
     dimensions = img_orig.shape  # Returns rows, columns, and channels
     h = dimensions[0]
     width = dimensions[1]
