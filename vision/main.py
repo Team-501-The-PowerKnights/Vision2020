@@ -17,10 +17,11 @@ os, camera_location, calibration, freqFramesNT, address = run_config(
 
 
 def main():
-    camera_table = nt_init(address)
+    # camera_table = nt_init(address)
+    camera_table = None
     cap = cap_init(camera_location)
-    rect_cnt1, rect_cnt2 = create_rect(calibration['debug'])
-    run(cap, camera_table, calibration, freqFramesNT, rect_cnt1, rect_cnt2)
+    desired_rect = create_rect()
+    run(cap, camera_table, calibration, freqFramesNT, desired_rect)
 
 
 def nt_init(robot_address):
@@ -65,52 +66,14 @@ def nt_init(robot_address):
         return vision_table
 
 
-def create_rect(debug):
-    """
-        Creates a rectangle and performs appropriate processing to provide a target
-        returns the contour object of the rectangle
-        :return the two contours of the rectangle we want to validate targets
-        against (returned as a tuple)
-        """
-    # Draw rectangles of the retro reflective tape (Find dimensions in the game manual)
-    # Camera dimensions: 320 x 240
-    # Rectangle dimensions: 40 x 110
-    if debug:
-        timer_rect = SW('rect')
-        timer_rect.start()
-    width = 40
-    length = 110
-    img_width = 175
-    img_length = 175
-
-    top_left_x = int(img_width - width / 2)
-    top_left_y = int(img_length - length / 2)
-    bottom_right_x = int(img_width + width / 2)
-    bottom_right_y = int(img_length + length / 2)
-
-    background = np.zeros((350, 350, 3), np.uint8)
-    rect1 = cv2.rectangle(background, (top_left_x, top_left_y),
-                          (bottom_right_x, bottom_right_y), (255, 255, 255), -1)
-    m = cv2.getRotationMatrix2D((350 / 2, 350 / 2), -14.5, 1)
-    rect1_rotated = cv2.warpAffine(rect1, m, (350, 350))
-    ret, thresh = cv2.threshold(rect1_rotated, 127, 255, cv2.THRESH_BINARY)
+def create_rect():
+    img = cv2.imread("../images/2020_target.png")
+    ret, thresh = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
     thresh = cv2.cvtColor(thresh, cv2.COLOR_BGR2GRAY)
-    contours, _ = cv2.findContours(
+    contour, _ = cv2.findContours(
         thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    cnt1 = contours[0]
-
-    rect2 = rect1
-    m = cv2.getRotationMatrix2D((350 / 2, 350 / 2), 14.5, 1)
-    rect2_rotated = cv2.warpAffine(rect2, m, (350, 350))
-    ret, thresh = cv2.threshold(rect2_rotated, 127, 255, cv2.THRESH_BINARY)
-    thresh = cv2.cvtColor(thresh, cv2.COLOR_BGR2GRAY)
-    contours, _ = cv2.findContours(
-        thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    cnt2 = contours[0]
-    if debug:
-        elapsed = timer_rect.get()
-        print('DEBUG: rectangles took ' + str(elapsed))
-    return cnt1, cnt2
+    # cv2.drawContours(img, contour, 0, (0, 255, 0), 3)
+    return contour
 
 
 def nt_send(camera_table, angle, valid_count, valid_update):
@@ -137,16 +100,17 @@ def cap_init(camera_location):
     :param camera_location: what the camera url is
     :return: cap returned from cv2.VideoCapture
     """
-    try:
-        cap = cv2.VideoCapture(eval(camera_location))
-        time.sleep(1)
-    except:
-        print("Exception on VideoCapture init. Dying")
-        sys.exit()
+    # try:
+    #     cap = cv2.VideoCapture(eval(camera_location))
+    #     time.sleep(1)
+    # except:
+    #     print("Exception on VideoCapture init. Dying")
+    #     sys.exit()
+    cap = cv2.imread("../images/2020_target.png", 0)
     return cap
 
 
-def run(cap, camera_table, calibration, freqFramesNT, rect_cnt1, rect_cnt2):
+def run(cap, camera_table, calibration, freqFramesNT, desired_cnt):
     """
     Run the main vision algorithm on each camera frame and update network table appropriately
     :param cap: cap returned from cv2.VideoCapture
@@ -158,36 +122,42 @@ def run(cap, camera_table, calibration, freqFramesNT, rect_cnt1, rect_cnt2):
     """
     valid_count = 0
     n = 0
-    while cap.isOpened():
-        ret, frame = cap.read()
+    x = 0
+    # while cap.isOpened():
+    while x < 1:
+        x += 1
+        # ret, frame = cap.read()
+        ret = True
+        frame = cap
         if ret:
-            try:
-                if calibration['debug']:
-                    timer_fv = SW('FV')
-                    timer_fv.start()
-                angle, valid_update = FT.find_valids(
-                    frame, calibration, rect_cnt1, rect_cnt2)
-                if calibration['debug']:
-                    elapsed = timer_fv.get()
-                    print("DEBUG: find_valids took " + str(elapsed))
-                    print("DEBUG: angle: " + str(angle) + " valid_update: " +
-                          str(valid_update) + " valid_count: " + str(valid_count))
-                if valid_update:
-                    valid_count += 1
-                if n > freqFramesNT:
-                    nt_send(camera_table, angle, valid_count, valid_update)
-                    n = 0
-                else:
-                    n += 1
-            except:
-                print("WARNING: There was an error with find_valids. Continuing.")
-                continue
+            # try:
+            if calibration['debug']:
+                timer_fv = SW('FV')
+                timer_fv.start()
+            angle, valid_update = FT.find_valids(
+                frame, calibration, desired_cnt)
+            if valid_update:
+                valid_count += 1
+            if calibration['debug']:
+                elapsed = timer_fv.get()
+                print("DEBUG: find_valids took " + str(elapsed))
+                print("DEBUG: angle: " + str(angle) + " valid_update: " +
+                      str(valid_update) + " valid_count: " + str(valid_count))
+            if n > freqFramesNT:
+                # nt_send(camera_table, angle, valid_count, valid_update)
+                n = 0
+            else:
+                n += 1
+
+           # except:
+                #print("WARNING: There was an error with find_valids. Continuing.")
+                # continue
         else:
             print("WARNING: Unable to read frame. Continuing.")
             continue
-    else:
-        print("ERROR: Capture is not opened. Ending program.")
-        sys.exit()
+    # else:
+        #print("ERROR: Capture is not opened. Ending program.")
+        # sys.exit()
 
 
 if __name__ == "__main__":

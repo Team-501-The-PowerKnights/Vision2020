@@ -18,7 +18,8 @@ def run_config(cfg, file):
         print("INFO: reading configuration from config.ini")
 
         if file is None:
-            file = 'config.ini'  # hackish fallback
+            # file = 'config.ini'  # hackish fallback
+            file = "config.correct"
         try:
             config.read_file(open(file))
         except FileNotFoundError:
@@ -48,10 +49,10 @@ def run_config(cfg, file):
         search = config['search']['search']
         address = config['robot']['address']
     except configparser.NoSectionError:
-        print("WARNING: config.ini does not contain correct [sections] . see config.correct ")
+        print(
+            "WARNING: config.ini does not contain correct [sections] . see config.correct ")
     except configparser.NoOptionError:
         print("WARNING: config.ini does not contain correct options. see config.correct ")
-
 
     if not os:
         print("INFO: Host OS configuration not present, using \'linux\'. ")
@@ -107,7 +108,8 @@ def run_config(cfg, file):
 def write_cal(cal):
     config = configparser.ConfigParser()
     config.read('config.ini')
-    config.set('mask', 'green_upper', ','.join(cal['green']['green_upper']))  # convert lists into single strings
+    # convert lists into single strings
+    config.set('mask', 'green_upper', ','.join(cal['green']['green_upper']))
     config.set('mask', 'green_lower', ','.join(cal['green']['green_lower']))
 
     print('Validating configuration and writing to disk.')

@@ -5,18 +5,23 @@ from heapq import nlargest
 import manipulate_image as MI
 
 
-def isValidShape(contour, rect_cnt, rect_cnt2):
+def isValidShape(contour, desired_cnt):
     """
     Use cv2.matchShapes to see if the contour is close enough to the shape we are looking for
     :param contour: contour of potential target being analyzed
     :param rect_cnt: contour of what the perfect target should be
     :return: boolean, True if the shape match is within the allowable threshold, False otherwise
     """
-    match_threshold = 0.35
-
-    match_quality1 = cv2.matchShapes(rect_cnt, contour, 2, 0)
-    match_quality2 = cv2.matchShapes(rect_cnt2, contour, 2, 0)
-    if match_quality1 < match_threshold or match_quality2 < match_threshold:
+    match_threshold = 2
+    match_quality1 = cv2.matchShapes(
+        desired_cnt[0], contour[0], 1, 0.0)
+    match_quality2 = cv2.matchShapes(
+        desired_cnt[0], contour[0], 2, 0.0)
+    match_quality3 = cv2.matchShapes(
+        desired_cnt[0], contour[0], 3, 0.0)
+    matches = [match_quality1, match_quality2, match_quality3]
+    match_quality = min(matches)
+    if match_quality < match_threshold:
         return True
     else:
         return False
@@ -35,7 +40,7 @@ def sortArray(sorted_indices, array):
     return sorted
 
 
-def find_valid_target(mask, rect_cnt1, rect_cnt2):
+def find_valid_target(mask, desired_cnt):
     """
 
     :param image: frame to be analyzed
@@ -52,39 +57,31 @@ def find_valid_target(mask, rect_cnt1, rect_cnt2):
     # find contours
     contours, _ = cv2.findContours(
         mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    # take 10 longest contours
-    biggestContours = nlargest(numContours, contours, key=len)
     # get area of each contour
+    biggestContours = sorted(contours, key=len, reverse=True)
     areas = []
     goodContours = []
-    if len(biggestContours) > 1:
+    if len(biggestContours) > 0:
         for cnt in biggestContours:
             areas.append(cv2.contourArea(cnt))
         sorted_indices = np.argsort(areas)
         max_index = np.where(sorted_indices == len(sorted_indices) - 1)[0][0]
-        second_index = np.where(
-            sorted_indices == len(sorted_indices) - 2)[0][0]
-        biggestContours = [biggestContours[max_index],
-                           biggestContours[second_index]]
+        if len(sorted_indices) > 1:
+            second_index = np.where(
+                sorted_indices == len(sorted_indices) - 2)[0][0]
+        else:
+            second_index = max_index
+        biggestContours = [[biggestContours[max_index]],
+                           [biggestContours[second_index]]]
         # check validity of contours by shape match
         for contour in biggestContours:
-            if isValidShape(contour, rect_cnt1, rect_cnt2):
+            if isValidShape(contour, desired_cnt):
                 goodContours.append(contour)
         # get the center of mass for each valid contour
-        xCOM = []
-        yCOM = []
-        for contour in goodContours:
-            cx, cy = IC.findCenter(contour)
-            xCOM.append(cx)
-            yCOM.append(cy)
-    if len(goodContours) < 2:
-        cnt = [0, 0]
+    if len(goodContours) == 0:
+        cnt = [0]
         valid = False
-        cx = [0, 0]
-        cy = [0, 0]
     else:
-        cnt = goodContours
+        cnt = goodContours[0]
         valid = True
-        cx = xCOM
-        cy = yCOM
-    return valid, cnt, cx, cy
+    return valid, cnt
