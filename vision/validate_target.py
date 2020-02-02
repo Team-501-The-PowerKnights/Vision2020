@@ -12,9 +12,15 @@ def isValidShape(contour, desired_cnt):
     :param rect_cnt: contour of what the perfect target should be
     :return: boolean, True if the shape match is within the allowable threshold, False otherwise
     """
-    match_threshold = 0.35
-    match_quality = cv2.matchShapes(
+    match_threshold = 2
+    match_quality1 = cv2.matchShapes(
+        desired_cnt[0], contour[0], 1, 0.0)
+    match_quality2 = cv2.matchShapes(
         desired_cnt[0], contour[0], 2, 0.0)
+    match_quality3 = cv2.matchShapes(
+        desired_cnt[0], contour[0], 3, 0.0)
+    matches = [match_quality1, match_quality2, match_quality3]
+    match_quality = min(matches)
     if match_quality < match_threshold:
         return True
     else:
