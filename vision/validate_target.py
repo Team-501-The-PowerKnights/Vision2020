@@ -13,10 +13,9 @@ def isValidShape(contour, desired_cnt):
     :return: boolean, True if the shape match is within the allowable threshold, False otherwise
     """
     match_threshold = 0.35
-
-    match_quality1 = cv2.matchShapes(rect_cnt, contour, 2, 0)
-    match_quality2 = cv2.matchShapes(rect_cnt2, contour, 2, 0)
-    if match_quality1 < match_threshold or match_quality2 < match_threshold:
+    match_quality = cv2.matchShapes(
+        desired_cnt[0], contour[0], 2, 0.0)
+    if match_quality < match_threshold:
         return True
     else:
         return False
@@ -52,20 +51,22 @@ def find_valid_target(mask, desired_cnt):
     # find contours
     contours, _ = cv2.findContours(
         mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    # take 10 longest contours
-    biggestContours = nlargest(numContours, contours, key=len)
     # get area of each contour
+    biggestContours = sorted(contours, key=len, reverse=True)
     areas = []
     goodContours = []
-    if len(biggestContours) > 1:
+    if len(biggestContours) > 0:
         for cnt in biggestContours:
             areas.append(cv2.contourArea(cnt))
         sorted_indices = np.argsort(areas)
         max_index = np.where(sorted_indices == len(sorted_indices) - 1)[0][0]
-        second_index = np.where(
-            sorted_indices == len(sorted_indices) - 2)[0][0]
-        biggestContours = [biggestContours[max_index],
-                           biggestContours[second_index]]
+        if len(sorted_indices) > 1:
+            second_index = np.where(
+                sorted_indices == len(sorted_indices) - 2)[0][0]
+        else:
+            second_index = max_index
+        biggestContours = [[biggestContours[max_index]],
+                           [biggestContours[second_index]]]
         # check validity of contours by shape match
         for contour in biggestContours:
             if isValidShape(contour, desired_cnt):
