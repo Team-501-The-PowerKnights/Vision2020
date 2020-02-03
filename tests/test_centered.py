@@ -1,6 +1,5 @@
 import subprocess
 import os
-import pytest
 from command import run_command
 
 os.chdir("../vision")
