@@ -104,6 +104,7 @@ def cap_init(camera_location, img_path=False):
     """
     Initialize camera
     :param camera_location: what the camera url is
+    :param img_path: path to the image if testing
     :return: cap returned from cv2.VideoCapture
     """
     if type(img_path) == type(""):
