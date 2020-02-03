@@ -1,5 +1,6 @@
 import cv2
 import time
+import os as OS
 import sys
 import logging
 from util.config import run_config
@@ -19,7 +20,12 @@ os, camera_location, calibration, freqFramesNT, address = run_config(
 def main():
     # camera_table = nt_init(address)
     camera_table = None
-    cap = cap_init(camera_location)
+    if "imgName.txt" in OS.listdir():
+        with open("imgName.txt") as imgPathFile:
+            imgName = imgPathFile.read().strip("\n")
+        cap = cap_init(camera_location, "../images/" + imgName)
+    else:
+        cap = cap_init(camera_location)
     desired_rect = create_rect()
     run(cap, camera_table, calibration, freqFramesNT, desired_rect)
 
@@ -94,19 +100,21 @@ def nt_send(camera_table, angle, valid_count, valid_update):
     camera_table.putNumber("Vision.count", valid_count)
 
 
-def cap_init(camera_location):
+def cap_init(camera_location, img_path=False):
     """
     Initialize camera
     :param camera_location: what the camera url is
     :return: cap returned from cv2.VideoCapture
     """
-    # try:
-    #     cap = cv2.VideoCapture(eval(camera_location))
-    #     time.sleep(1)
-    # except:
-    #     print("Exception on VideoCapture init. Dying")
-    #     sys.exit()
-    cap = cv2.imread("../images/2020_target.png", 0)
+    if type(img_path) == type(""):
+        cap = cv2.imread(img_path, 0)
+    else:
+        try:
+            cap = cv2.VideoCapture(eval(camera_location))
+            time.sleep(1)
+        except:
+            print("Exception on VideoCapture init. Dying")
+            sys.exit()
     return cap
 
 
