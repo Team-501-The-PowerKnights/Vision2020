@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+  vision2020:
+    image: powerknightsrobotics/vision2020
+    container_name: vision2020
+    restart: unless-stopped
+    networks:
+      - overlay
+    ports:
+      - "1180:1180"
