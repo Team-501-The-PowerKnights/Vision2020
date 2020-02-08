@@ -2,7 +2,7 @@
 
 Hello and thank you for contributing to Team 501 the PowerKnight's vision program! Below are some rules regarding contributing to this repo. Please read this before making a PR and  especially before pushing master.
 
-# Team Member
+## Team Member
 
 If you are a member of the team you have full push access to the repo. This means that you can push to the repo without having to fork it and make a PR from that fork to the master branch. So the following process should take place when you want to make changes to the program:
 
@@ -18,7 +18,7 @@ If you are a member of the team you have full push access to the repo. This mean
 5. Once all the checks have passed wait for one of the reviewers to approve and then your clear to merge you branch!
 6. Delete the branch that you created for the PR
 
-# Outside member
+## Outside member
 
 Same process for a team member except you need to fork the repo and then make your PR from that Fork. You also don't have access to putting tags or reviewers to your PR.
 
