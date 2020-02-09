@@ -121,41 +121,39 @@ def run(cap, camera_table, calibration, freqFramesNT, desired_cnt):
     valid_count = 0
     n = 0
     x = 0
-    # while cap.isOpened():
-    while x < 1:
+    while cap.isOpened():
         x += 1
-        # ret, frame = cap.read()
+        ret, frame = cap.read()
         ret = True
         frame = cap
         if ret:
-            # try:
-            if calibration['debug']:
-                timer_fv = SW('FV')
-                timer_fv.start()
-            angle, valid_update = FT.find_valids(
-                frame, calibration, desired_cnt)
-            if valid_update:
-                valid_count += 1
-            if calibration['debug']:
-                elapsed = timer_fv.get()
-                print("DEBUG: find_valids took " + str(elapsed))
-                print("DEBUG: angle: " + str(angle) + " valid_update: " +
-                      str(valid_update) + " valid_count: " + str(valid_count))
-            if n > freqFramesNT:
-                # nt_send(camera_table, angle, valid_count, valid_update)
-                n = 0
-            else:
-                n += 1
-
-           # except:
-                #print("WARNING: There was an error with find_valids. Continuing.")
-                # continue
+            try:
+                if calibration['debug']:
+                    timer_fv = SW('FV')
+                    timer_fv.start()
+                angle, valid_update = FT.find_valids(
+                    frame, calibration, desired_cnt)
+                if valid_update:
+                    valid_count += 1
+                if calibration['debug']:
+                    elapsed = timer_fv.get()
+                    print("DEBUG: find_valids took " + str(elapsed))
+                    print("DEBUG: angle: " + str(angle) + " valid_update: " +
+                        str(valid_update) + " valid_count: " + str(valid_count))
+                if n > freqFramesNT:
+                    nt_send(camera_table, angle, valid_count, valid_update)
+                    n = 0
+                else:
+                    n += 1
+           except:
+                print("WARNING: There was an error with find_valids. Continuing.")
+                continue
         else:
             print("WARNING: Unable to read frame. Continuing.")
             continue
-    # else:
-        #print("ERROR: Capture is not opened. Ending program.")
-        # sys.exit()
+    else:
+        print("ERROR: Capture is not opened. Ending program.")
+        sys.exit()
 
 
 if __name__ == "__main__":

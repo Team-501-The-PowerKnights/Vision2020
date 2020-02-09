@@ -30,27 +30,27 @@ def find_valids(img_orig, calibration, desired_cnt):
     if debug:
         timer_ft = SW('ft')
         timer_ft.start()
-    #hsv = cv2.cvtColor(img_copy, cv2.COLOR_BGR2HSV)
+    hsv = cv2.cvtColor(img_copy, cv2.COLOR_BGR2HSV)
     if debug:
         elapsed = timer_ft.get()
         print("DEBUG: cvt took " + str(elapsed))
     if debug:
         timer_ft.start()
-    #mask = cv2.inRange(hsv, lower_bound, upper_bound)
+    mask = cv2.inRange(hsv, lower_bound, upper_bound)
     if debug:
         elapsed = timer_ft.get()
         print("DEBUG: inrange took " + str(elapsed))
     if debug:
         timer_ft.start()
-    #erode_and_diliate = MI.erodeAndDilate(mask)
+    erode_and_diliate = MI.erodeAndDilate(mask)
     if debug:
         elapsed = timer_ft.get()
         print("DEBUG: erode_and_dilate took " + str(elapsed))
     if debug:
         timer_ft.start()
-    # ret, mask_thresh = cv2.threshold(
-        # erode_and_diliate, 127, 255, cv2.THRESH_BINARY)
-        ret, mask_thresh = cv2.threshold(img_orig, 127, 255, cv2.THRESH_BINARY)
+    ret, mask_thresh = cv2.threshold(
+        erode_and_diliate, 127, 255, cv2.THRESH_BINARY)
+    ret, mask_thresh = cv2.threshold(img_orig, 127, 255, cv2.THRESH_BINARY)
     if debug:
         elapsed = timer_ft.get()
         print("DEBUG: threshold took " + str(elapsed))
@@ -58,10 +58,10 @@ def find_valids(img_orig, calibration, desired_cnt):
         time = datetime.now().strftime("%s")
         cv2.imwrite(path +
                     time+"image_orig.png", img_orig)
-        #cv2.imwrite(path+time+"mask.png", mask)
+        cv2.imwrite(path+time+"mask.png", mask)
         cv2.imwrite(path+time+"mask.png", mask_thresh)
-        # cv2.imwrite(path+time +
-        #             "erode_and_diliate.png", erode_and_diliate)
+        cv2.imwrite(path+time +
+                    "erode_and_diliate.png", erode_and_diliate)
     if search:
         valid, cnt = VT.find_valid_target(mask_thresh, desired_cnt)
         if valid:
