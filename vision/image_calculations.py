@@ -14,14 +14,14 @@ camera_res = [320, 240]
 
 
 def findAngle(img_orig, cx):
-    """
-    Input:
-        image
-        cx -> float center coordinate of first rectangle
-    Output:
-        angle -> float
+    """[summary]
 
-    This function finds the robot's angle relative to the center of the target
+    Arguments:
+        img_orig {[type]} -- [description]
+        cx {[type]} -- [description]
+
+    Returns:
+        [type] -- [description]
     """
     camera_FOV = 49.6
     dimensions = img_orig.shape  # Returns rows, columns, and channels
@@ -33,10 +33,13 @@ def findAngle(img_orig, cx):
 
 
 def findCenter(cnt):
-    """
-    Find the center coordinates of a given contour cnt
-    :param cnt: the contour of the target
-    :return: the center x coordinate (cx), the center y coordinate (cy)
+    """[summary]
+
+    Arguments:
+        cnt {[type]} -- [description]
+
+    Returns:
+        [type] -- [description]
     """
     M = cv2.moments(cnt)
     cX = int(M["m10"] / M["m00"])
@@ -45,12 +48,13 @@ def findCenter(cnt):
 
 
 def organizeCorners(corners):
-    """
-    Take corner coordinates and organize them in a specific order for easier computations later
-     This is necessary because the corners are returned in a different order each time they are determined
-    :param corners: the corners of the target found in feature detection
-    :return: Rect_coor a nested list of coordinates where corner 0 is the top left corner and the rest are
-    numbered clockwise. Each list representing each corner is in [x, y]
+    """[summary]
+
+    Arguments:
+        corners {[type]} -- [description]
+
+    Returns:
+        [type] -- [description]
     """
     # Save e
     def saveCoordinates(topLeftX, topLeftY, topRightX, topRightY, bottomRightX, bottomRightY, bottomLeftX, bottomLeftY):

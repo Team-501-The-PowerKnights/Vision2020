@@ -18,6 +18,8 @@ os, camera_location, calibration, freqFramesNT, address = run_config(
 
 
 def main():
+    """[summary]
+    """
     camera_table = nt_init(address)
     cap = cap_init(camera_location)
     desired_rect = create_rect()
@@ -25,10 +27,13 @@ def main():
 
 
 def nt_init(robot_address):
-    """
-    Initialize network tables
-    :parameter robot address
-    :return camera network table
+    """[summary]
+
+    Arguments:
+        robot_address {[type]} -- [description]
+
+    Returns:
+        [type] -- [description]
     """
     bot_address_found = False
     while not bot_address_found:
@@ -67,6 +72,11 @@ def nt_init(robot_address):
 
 
 def create_rect():
+    """[summary]
+
+    Returns:
+        [type] -- [description]
+    """
     img = cv2.imread("../images/2020_target.png")
     ret, thresh = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
     thresh = cv2.cvtColor(thresh, cv2.COLOR_BGR2GRAY)
@@ -77,16 +87,13 @@ def create_rect():
 
 
 def nt_send(camera_table, angle, valid_count, valid_update):
-    """
-    Send relevant data to the network table
-    :param camera_table: camera network table
-    :param angle: angle to target
-    :param valid_count: number of valid updates we have found
-    :param valid_update: boolean True if valid target found, false otherwise
-    :return: None
-    Vision.angle (double)
-    Vision.locked (boolean)
-    Vision.count (integer)
+    """[summary]
+
+    Arguments:
+        camera_table {[type]} -- [description]
+        angle {[type]} -- [description]
+        valid_count {[type]} -- [description]
+        valid_update {[type]} -- [description]
     """
     camera_table.putNumber("Vision.angle", angle)
     camera_table.putBoolean("Vision.locked", valid_update)
@@ -94,10 +101,13 @@ def nt_send(camera_table, angle, valid_count, valid_update):
 
 
 def cap_init(camera_location):
-    """
-    Initialize camera
-    :param camera_location: what the camera url is
-    :return: cap returned from cv2.VideoCapture
+    """[summary]
+
+    Arguments:
+        camera_location {[type]} -- [description]
+
+    Returns:
+        [type] -- [description]
     """
     try:
         cap = cv2.VideoCapture(eval(camera_location))
@@ -109,14 +119,14 @@ def cap_init(camera_location):
 
 
 def run(cap, camera_table, calibration, freqFramesNT, desired_cnt):
-    """
-    Run the main vision algorithm on each camera frame and update network table appropriately
-    :param cap: cap returned from cv2.VideoCapture
-    :param camera_table: the network table we are writing to
-    :param calibration: dictionary containing hsv thresholds and whether we are in debug mode or not
-    :param freqFramesNT: frequency of frames for data to be sent to network tables
-    :param rect_cnt: contour of the rectangle we want to validate targets against
-    :return: None
+    """[summary]
+
+    Arguments:
+        cap {[type]} -- [description]
+        camera_table {[type]} -- [description]
+        calibration {[type]} -- [description]
+        freqFramesNT {[type]} -- [description]
+        desired_cnt {[type]} -- [description]
     """
     valid_count = 0
     n = 0

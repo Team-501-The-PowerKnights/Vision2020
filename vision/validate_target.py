@@ -6,11 +6,14 @@ import manipulate_image as MI
 
 
 def isValidShape(contour, desired_cnt):
-    """
-    Use cv2.matchShapes to see if the contour is close enough to the shape we are looking for
-    :param contour: contour of potential target being analyzed
-    :param rect_cnt: contour of what the perfect target should be
-    :return: boolean, True if the shape match is within the allowable threshold, False otherwise
+    """[summary]
+
+    Arguments:
+        contour {[type]} -- [description]
+        desired_cnt {[type]} -- [description]
+
+    Returns:
+        [type] -- [description]
     """
     match_threshold = 2
     match_quality1 = cv2.matchShapes(
@@ -28,11 +31,14 @@ def isValidShape(contour, desired_cnt):
 
 
 def sortArray(sorted_indices, array):
-    """
-    Sort an array according to the provided indices
-    :param sorted_indices: the indices provided by argsort
-    :param array: the array to sort
-    :return: a sortedf array
+    """[summary]
+
+    Arguments:
+        sorted_indices {[type]} -- [description]
+        array {[type]} -- [description]
+
+    Returns:
+        [type] -- [description]
     """
     sorted = []
     for index in sorted_indices:
@@ -41,16 +47,14 @@ def sortArray(sorted_indices, array):
 
 
 def find_valid_target(mask, desired_cnt):
-    """
+    """[summary]
 
-    :param image: frame to be analyzed
-    :param mask: mask of thresholded hsv image
-    :param rect_cnt1: contour of perfect target rectangle
-    :param rect_cnt2: contour of the other perfect target rectangle
-    :return: valid: boolean, True if valid target, False otherwise
-            cnt: list where first entry is the contour of target 1 and second entry is contour of target 2
-            cx: list of the center of mass for x of the two contours
-            cy: list of the center of mass for y of the two contours
+    Arguments:
+        mask {[type]} -- [description]
+        desired_cnt {[type]} -- [description]
+
+    Returns:
+        [type] -- [description]
     """
     # initialize variables
     numContours = 10

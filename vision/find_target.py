@@ -9,15 +9,15 @@ from datetime import datetime
 
 
 def find_valids(img_orig, calibration, desired_cnt):
-    """
-    Input: image from camera, calibration information, contours from generated rectangle
-    Output:
-        angle -> float, angle from camera center to target center
-        validUpdate -> boolean, valid target found
+    """[summary]
 
-    This function uses calibration information to create a mask of the target. It then
-    finds valid targets comparing to the rectangle contours, calculates the angle to target center,
-    and provides graphical representations for future use.
+    Arguments:
+        img_orig {[type]} -- [description]
+        calibration {[type]} -- [description]
+        desired_cnt {[type]} -- [description]
+
+    Returns:
+        [type] -- [description]
     """
     path = "/" + "/".join(os.getcwd().split("/")[1:3]) + "/test_images/"
     debug = calibration['debug']
