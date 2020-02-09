@@ -18,22 +18,22 @@ os, camera_location, calibration, freqFramesNT, address = run_config(
 
 
 def main():
-    """[summary]
+    """Main function for the program
     """
-    camera_table = nt_init(address)
+    vision_table = nt_init(address)
     cap = cap_init(camera_location)
     desired_rect = create_rect()
-    run(cap, camera_table, calibration, freqFramesNT, desired_rect)
+    run(cap, vision_table, calibration, freqFramesNT, desired_rect)
 
 
 def nt_init(robot_address):
-    """[summary]
+    """Initialize network tables
 
     Arguments:
-        robot_address {[type]} -- [description]
+        robot_address {str} -- Address for the roborio
 
     Returns:
-        [type] -- [description]
+        object -- The vision table from the network tables
     """
     bot_address_found = False
     while not bot_address_found:
@@ -72,10 +72,10 @@ def nt_init(robot_address):
 
 
 def create_rect():
-    """[summary]
+    """Creates a rectangle and performs appropriate processing to provide a target
 
     Returns:
-        [type] -- [description]
+        tuple -- the two contours of the rectangle we want to validate targets against
     """
     img = cv2.imread("../images/2020_target.png")
     ret, thresh = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
@@ -86,18 +86,18 @@ def create_rect():
     return contour
 
 
-def nt_send(camera_table, angle, valid_count, valid_update):
-    """[summary]
+def nt_send(vision_table, angle, valid_count, valid_update):
+    """Send relevant data to the network table
 
     Arguments:
-        camera_table {[type]} -- [description]
+        vision_table {object} -- vision network table
         angle {[type]} -- [description]
         valid_count {[type]} -- [description]
         valid_update {[type]} -- [description]
     """
-    camera_table.putNumber("Vision.angle", angle)
-    camera_table.putBoolean("Vision.locked", valid_update)
-    camera_table.putNumber("Vision.count", valid_count)
+    vision_table.putNumber("Vision.angle", angle)
+    vision_table.putBoolean("Vision.locked", valid_update)
+    vision_table.putNumber("Vision.count", valid_count)
 
 
 def cap_init(camera_location):
@@ -118,12 +118,12 @@ def cap_init(camera_location):
     return cap
 
 
-def run(cap, camera_table, calibration, freqFramesNT, desired_cnt):
+def run(cap, vision_table, calibration, freqFramesNT, desired_cnt):
     """[summary]
 
     Arguments:
         cap {[type]} -- [description]
-        camera_table {[type]} -- [description]
+        vision_table {[type]} -- [description]
         calibration {[type]} -- [description]
         freqFramesNT {[type]} -- [description]
         desired_cnt {[type]} -- [description]
@@ -151,7 +151,7 @@ def run(cap, camera_table, calibration, freqFramesNT, desired_cnt):
                     print("DEBUG: angle: " + str(angle) + " valid_update: " +
                         str(valid_update) + " valid_count: " + str(valid_count))
                 if n > freqFramesNT:
-                    nt_send(camera_table, angle, valid_count, valid_update)
+                    nt_send(vision_table, angle, valid_count, valid_update)
                     n = 0
                 else:
                     n += 1
