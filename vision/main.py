@@ -86,7 +86,7 @@ def create_rect():
     return contour
 
 
-def nt_send(vision_table, angle, valid_count, valid_update):
+def nt_send(vision_table, angle, valid_count, valid_update, heartbeat):
     """Send relevant data to the network table
 
     Arguments:
@@ -98,6 +98,7 @@ def nt_send(vision_table, angle, valid_count, valid_update):
     vision_table.putNumber("Vision.angle", angle)
     vision_table.putBoolean("Vision.locked", valid_update)
     vision_table.putNumber("Vision.count", valid_count)
+    vision_table.putNumber("Vision.heartbeat", heartbeat)
 
 
 def cap_init(camera_location):
@@ -129,9 +130,11 @@ def run(cap, vision_table, calibration, freqFramesNT, desired_cnt):
         desired_cnt {[type]} -- [description]
     """
     valid_count = 0
+    heartbeat = 0
     n = 0
     x = 0
     while cap.isOpened():
+        heartbeat += 1
         x += 1
         ret, frame = cap.read()
         if ret:
@@ -149,7 +152,8 @@ def run(cap, vision_table, calibration, freqFramesNT, desired_cnt):
                     print("DEBUG: angle: " + str(angle) + " valid_update: " +
                           str(valid_update) + " valid_count: " + str(valid_count))
                 if n > freqFramesNT:
-                    nt_send(vision_table, angle, valid_count, valid_update)
+                    nt_send(vision_table, angle, valid_count,
+                            valid_update, heartbeat)
                     n = 0
                 else:
                     n += 1
