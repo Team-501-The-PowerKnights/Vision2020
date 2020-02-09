@@ -149,13 +149,13 @@ def run(cap, vision_table, calibration, freqFramesNT, desired_cnt):
                     elapsed = timer_fv.get()
                     print("DEBUG: find_valids took " + str(elapsed))
                     print("DEBUG: angle: " + str(angle) + " valid_update: " +
-                        str(valid_update) + " valid_count: " + str(valid_count))
+                          str(valid_update) + " valid_count: " + str(valid_count))
                 if n > freqFramesNT:
                     nt_send(vision_table, angle, valid_count, valid_update)
                     n = 0
                 else:
                     n += 1
-           except:
+            except:
                 print("WARNING: There was an error with find_valids. Continuing.")
                 continue
         else:
