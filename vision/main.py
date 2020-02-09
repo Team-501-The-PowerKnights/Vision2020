@@ -18,14 +18,8 @@ os, camera_location, calibration, freqFramesNT, address = run_config(
 
 
 def main():
-    # camera_table = nt_init(address)
-    camera_table = None
-    if "imgName.txt" in OS.listdir():
-        with open("imgName.txt") as imgPathFile:
-            imgName = imgPathFile.read().strip("\n")
-        cap = cap_init(camera_location, "../images/" + imgName)
-    else:
-        cap = cap_init(camera_location)
+    camera_table = nt_init(address)
+    cap = cap_init(camera_location)
     desired_rect = create_rect()
     run(cap, camera_table, calibration, freqFramesNT, desired_rect)
 
@@ -78,7 +72,7 @@ def create_rect():
     thresh = cv2.cvtColor(thresh, cv2.COLOR_BGR2GRAY)
     contour, _ = cv2.findContours(
         thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    # cv2.drawContours(img, contour, 0, (0, 255, 0), 3)
+    cv2.drawContours(img, contour, 0, (0, 255, 0), 3)
     return contour
 
 
@@ -94,28 +88,23 @@ def nt_send(camera_table, angle, valid_count, valid_update):
     Vision.locked (boolean)
     Vision.count (integer)
     """
-
     camera_table.putNumber("Vision.angle", angle)
     camera_table.putBoolean("Vision.locked", valid_update)
     camera_table.putNumber("Vision.count", valid_count)
 
 
-def cap_init(camera_location, img_path=False):
+def cap_init(camera_location):
     """
     Initialize camera
     :param camera_location: what the camera url is
-    :param img_path: path to the image if testing
     :return: cap returned from cv2.VideoCapture
     """
-    if type(img_path) == type(""):
-        cap = cv2.imread(img_path, 0)
-    else:
-        try:
-            cap = cv2.VideoCapture(eval(camera_location))
-            time.sleep(1)
-        except:
-            print("Exception on VideoCapture init. Dying")
-            sys.exit()
+    try:
+        cap = cv2.VideoCapture(eval(camera_location))
+        time.sleep(1)
+    except:
+        print("Exception on VideoCapture init. Dying")
+        sys.exit()
     return cap
 
 
