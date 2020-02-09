@@ -16,10 +16,6 @@
 	<br>
 </div>
 
-## Tests
-
-[![Actions Status](https://github.com/team-501-the-powerknights/Vision2020/workflows/Python/badge.svg)](https://github.com/team-501-the-powerknights/Vision2020/actions)
-
 ## Contributing
 
 Look at `CONTRIBUTING.md` for more information
