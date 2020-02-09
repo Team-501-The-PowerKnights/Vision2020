@@ -15,7 +15,7 @@ def isValidShape(contour, desired_cnt):
     Returns:
         [type] -- [description]
     """
-    match_threshold = 2
+    match_threshold = 2.8
     match_quality1 = cv2.matchShapes(
         desired_cnt[0], contour[0], 1, 0.0)
     match_quality2 = cv2.matchShapes(
