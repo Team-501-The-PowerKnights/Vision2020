@@ -6,7 +6,7 @@ hostname="raspberrypi.local"
 home="/home/pi"
 user="pi"
 
-if [ -f util/.ssh/id_rsa.pub ]; then
+if [ -f vision/util/.ssh/id_rsa.pub ]; then
    echo "Vision public key found."
    list=$(find $PWD -type f | grep -vE ".idea|.git|__pycache__")
    dirs=$(find . -type d |grep -vE ".git|.idea|__pycache__"| sed 's/^\.$//g; s/\.\///g')
@@ -19,7 +19,7 @@ if [ -f util/.ssh/id_rsa.pub ]; then
    echo "Creating remote directories..."
    for directory in $dirs;
       do
-         ssh -i $pwd/util/.ssh/id_rsa $user@$hostname "mkdir -p $home/$directory"
+         ssh -i $pwd/vision/util/.ssh/id_rsa $user@$hostname "mkdir -p $home/$directory"
          if [ $? -eq 0 ]; then
             echo "Created $directory"
          else
@@ -35,7 +35,7 @@ if [ -f util/.ssh/id_rsa.pub ]; then
          #echo $file
          next_dir=$(sed -e 's,'"$pwd"',,g' <<<"$file")
          destination=$base$next_dir
-         scp -q -r -i $pwd/util/.ssh/id_rsa $file $destination;
+         scp -q -r -i $pwd/vision/util/.ssh/id_rsa $file $destination;
          if [ $? -eq 0 ]; then
             code="good"
             echo "Deployed $next_dir"
