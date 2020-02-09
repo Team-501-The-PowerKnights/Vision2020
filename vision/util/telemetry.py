@@ -100,9 +100,9 @@ def telemetry_run(vision_table):
             continue
 
         try:
-            vision_table.putString('RPI/clock_speed', clock_speed)
-            vision_table.putString('RPI/soc_temp', soc_temp)
-            vision_table.putString('RPI/free_memory', free_memory)
+            vision_table.putString('RPI.clock_speed', clock_speed)
+            vision_table.putString('RPI.soc_temp', soc_temp)
+            vision_table.putString('RPI.free_memory', free_memory)
         except:
             print('ERROR: Problem sending networktables data (type error? see above)')
         time.sleep(sleep_time)
