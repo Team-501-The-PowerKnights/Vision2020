@@ -18,8 +18,7 @@ def run_config(cfg, file):
         print("INFO: reading configuration from config.ini")
 
         if file is None:
-            # file = 'config.ini'  # hackish fallback
-            file = "config.correct"
+            file = 'config.ini'
         try:
             config.read_file(open(file))
         except FileNotFoundError:

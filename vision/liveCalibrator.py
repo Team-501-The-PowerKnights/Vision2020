@@ -21,10 +21,23 @@ from util.config import run_config, write_cal
 
 
 def nothing(x):
+    """[summary]
+
+    Arguments:
+        x {[type]} -- [description]
+    """
     pass
 
 
 def init_capture(cam):
+    """[summary]
+
+    Arguments:
+        cam {[type]} -- [description]
+
+    Returns:
+        [type] -- [description]
+    """
     try:
         if len(cam) == 1:
             print("INFO: using local camera device")
@@ -35,6 +48,14 @@ def init_capture(cam):
 
 
 def init_window(calibration):
+    """[summary]
+
+    Arguments:
+        calibration {[type]} -- [description]
+
+    Returns:
+        [type] -- [description]
+    """
 
     hl, sl, vl = calibration['green']['green_lower']
     hh, sh, vh = calibration['green']['green_upper']
@@ -66,6 +87,8 @@ def init_window(calibration):
 
 
 def main():
+    """[summary]
+    """
     _, cam, calibration, _, _ = run_config(None, 'config.ini')
     cap = init_capture(cam)
     switch = init_window(calibration)
@@ -73,6 +96,13 @@ def main():
 
 
 def run(cap, switch, calibration):
+    """[summary]
+
+    Arguments:
+        cap {[type]} -- [description]
+        switch {[type]} -- [description]
+        calibration {[type]} -- [description]
+    """
     while True:
         img = None
         try:

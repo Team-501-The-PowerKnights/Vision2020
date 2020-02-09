@@ -11,10 +11,13 @@ import numpy as np
 
 
 def erodeAndDilate(img):
-    """
-    Erodes and then dilates the mask of the image
-    :param img: the image frame mask being analyzed
-    :return: and eroded and dilated image
+    """[summary]
+
+    Arguments:
+        img {[type]} -- [description]
+
+    Returns:
+        [type] -- [description]
     """
     kernel = np.ones((5, 5), np.uint8)
     erosion = cv2.erode(img, kernel, iterations=1)
@@ -23,12 +26,15 @@ def erodeAndDilate(img):
 
 
 def drawLine2Target(img, cx, cy):
-    """
-    Draws a line from the center of the camera point of view to the center of the target
-    :param image: the original frame
-    :param cx: x coordinate of target center
-    :param cy: y coordinate of target center
-    :return: image with a line drawn to target
+    """[summary]
+
+    Arguments:
+        img {[type]} -- [description]
+        cx {[type]} -- [description]
+        cy {[type]} -- [description]
+
+    Returns:
+        [type] -- [description]
     """
     dimensions = img.shape
     centery = int(dimensions[0] / 2)
@@ -38,10 +44,13 @@ def drawLine2Target(img, cx, cy):
 
 
 def drawCrossHairs(img):
-    """
-    Draws cross-hairs in image donating the center of the camera view
-    :param img: the image being analyzed
-    :return: an image with cross-hairs drawn
+    """[summary]
+
+    Arguments:
+        img {[type]} -- [description]
+
+    Returns:
+        [type] -- [description]
     """
     dimensions = img.shape
     centery = int(dimensions[0] / 2)

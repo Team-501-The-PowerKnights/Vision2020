@@ -18,23 +18,22 @@ os, camera_location, calibration, freqFramesNT, address = run_config(
 
 
 def main():
-    # camera_table = nt_init(address)
-    camera_table = None
-    if "imgName.txt" in OS.listdir():
-        with open("imgName.txt") as imgPathFile:
-            imgName = imgPathFile.read().strip("\n")
-        cap = cap_init(camera_location, "../images/" + imgName)
-    else:
-        cap = cap_init(camera_location)
+    """Main function for the program
+    """
+    vision_table = nt_init(address)
+    cap = cap_init(camera_location)
     desired_rect = create_rect()
-    run(cap, camera_table, calibration, freqFramesNT, desired_rect)
+    run(cap, vision_table, calibration, freqFramesNT, desired_rect)
 
 
 def nt_init(robot_address):
-    """
-    Initialize network tables
-    :parameter robot address
-    :return camera network table
+    """Initialize network tables
+
+    Arguments:
+        robot_address {str} -- Address for the roborio
+
+    Returns:
+        object -- The vision table from the network tables
     """
     bot_address_found = False
     while not bot_address_found:
@@ -73,100 +72,96 @@ def nt_init(robot_address):
 
 
 def create_rect():
+    """Creates a rectangle and performs appropriate processing to provide a target
+
+    Returns:
+        tuple -- the two contours of the rectangle we want to validate targets against
+    """
     img = cv2.imread("../images/2020_target.png")
     ret, thresh = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
     thresh = cv2.cvtColor(thresh, cv2.COLOR_BGR2GRAY)
     contour, _ = cv2.findContours(
         thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    # cv2.drawContours(img, contour, 0, (0, 255, 0), 3)
+    cv2.drawContours(img, contour, 0, (0, 255, 0), 3)
     return contour
 
 
-def nt_send(camera_table, angle, valid_count, valid_update):
-    """
-    Send relevant data to the network table
-    :param camera_table: camera network table
-    :param angle: angle to target
-    :param valid_count: number of valid updates we have found
-    :param valid_update: boolean True if valid target found, false otherwise
-    :return: None
-    Vision.angle (double)
-    Vision.locked (boolean)
-    Vision.count (integer)
-    """
+def nt_send(vision_table, angle, valid_count, valid_update):
+    """Send relevant data to the network table
 
-    camera_table.putNumber("Vision.angle", angle)
-    camera_table.putBoolean("Vision.locked", valid_update)
-    camera_table.putNumber("Vision.count", valid_count)
+    Arguments:
+        vision_table {object} -- vision network table
+        angle {[type]} -- [description]
+        valid_count {[type]} -- [description]
+        valid_update {[type]} -- [description]
+    """
+    vision_table.putNumber("Vision.angle", angle)
+    vision_table.putBoolean("Vision.locked", valid_update)
+    vision_table.putNumber("Vision.count", valid_count)
 
 
-def cap_init(camera_location, img_path=False):
+def cap_init(camera_location):
+    """[summary]
+
+    Arguments:
+        camera_location {[type]} -- [description]
+
+    Returns:
+        [type] -- [description]
     """
-    Initialize camera
-    :param camera_location: what the camera url is
-    :param img_path: path to the image if testing
-    :return: cap returned from cv2.VideoCapture
-    """
-    if type(img_path) == type(""):
-        cap = cv2.imread(img_path, 0)
-    else:
-        try:
-            cap = cv2.VideoCapture(eval(camera_location))
-            time.sleep(1)
-        except:
-            print("Exception on VideoCapture init. Dying")
-            sys.exit()
+    try:
+        cap = cv2.VideoCapture(eval(camera_location))
+        time.sleep(1)
+    except:
+        print("Exception on VideoCapture init. Dying")
+        sys.exit()
     return cap
 
 
-def run(cap, camera_table, calibration, freqFramesNT, desired_cnt):
-    """
-    Run the main vision algorithm on each camera frame and update network table appropriately
-    :param cap: cap returned from cv2.VideoCapture
-    :param camera_table: the network table we are writing to
-    :param calibration: dictionary containing hsv thresholds and whether we are in debug mode or not
-    :param freqFramesNT: frequency of frames for data to be sent to network tables
-    :param rect_cnt: contour of the rectangle we want to validate targets against
-    :return: None
+def run(cap, vision_table, calibration, freqFramesNT, desired_cnt):
+    """[summary]
+
+    Arguments:
+        cap {[type]} -- [description]
+        vision_table {[type]} -- [description]
+        calibration {[type]} -- [description]
+        freqFramesNT {[type]} -- [description]
+        desired_cnt {[type]} -- [description]
     """
     valid_count = 0
     n = 0
     x = 0
-    # while cap.isOpened():
-    while x < 1:
+    while cap.isOpened():
         x += 1
-        # ret, frame = cap.read()
-        ret = True
-        frame = cap
+        ret, frame = cap.read()
         if ret:
-            # try:
-            if calibration['debug']:
-                timer_fv = SW('FV')
-                timer_fv.start()
-            angle, valid_update = FT.find_valids(
-                frame, calibration, desired_cnt)
-            if valid_update:
-                valid_count += 1
-            if calibration['debug']:
-                elapsed = timer_fv.get()
-                print("DEBUG: find_valids took " + str(elapsed))
-                print("DEBUG: angle: " + str(angle) + " valid_update: " +
-                      str(valid_update) + " valid_count: " + str(valid_count))
-            if n > freqFramesNT:
-                # nt_send(camera_table, angle, valid_count, valid_update)
-                n = 0
-            else:
-                n += 1
-
-           # except:
-                #print("WARNING: There was an error with find_valids. Continuing.")
-                # continue
+            try:
+                if calibration['debug']:
+                    timer_fv = SW('FV')
+                    timer_fv.start()
+                angle, valid_update = FT.find_valids(
+                    frame, calibration, desired_cnt)
+                if valid_update:
+                    valid_count += 1
+                if calibration['debug']:
+                    elapsed = timer_fv.get()
+                    print("DEBUG: find_valids took " + str(elapsed))
+                    print("DEBUG: angle: " + str(angle) + " valid_update: " +
+                          str(valid_update) + " valid_count: " + str(valid_count))
+                if n > freqFramesNT:
+                    nt_send(vision_table, angle, valid_count, valid_update)
+                    n = 0
+                else:
+                    n += 1
+            except:
+                print("WARNING: There was an error with find_valids. Continuing.")
+                continue
         else:
             print("WARNING: Unable to read frame. Continuing.")
             continue
-    # else:
-        #print("ERROR: Capture is not opened. Ending program.")
-        # sys.exit()
+    else:
+        print("ERROR: Capture is not opened. Ending program.")
+        sys.exit()
 
 
 if __name__ == "__main__":
