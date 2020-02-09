@@ -50,7 +50,6 @@ def find_valids(img_orig, calibration, desired_cnt):
         timer_ft.start()
     ret, mask_thresh = cv2.threshold(
         erode_and_diliate, 127, 255, cv2.THRESH_BINARY)
-    ret, mask_thresh = cv2.threshold(img_orig, 127, 255, cv2.THRESH_BINARY)
     if debug:
         elapsed = timer_ft.get()
         print("DEBUG: threshold took " + str(elapsed))
