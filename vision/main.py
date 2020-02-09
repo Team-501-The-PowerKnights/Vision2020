@@ -134,8 +134,6 @@ def run(cap, vision_table, calibration, freqFramesNT, desired_cnt):
     while cap.isOpened():
         x += 1
         ret, frame = cap.read()
-        ret = True
-        frame = cap
         if ret:
             try:
                 if calibration['debug']:
