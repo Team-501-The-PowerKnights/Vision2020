@@ -153,7 +153,7 @@ def run(cap, vision_table, calibration, freqFramesNT, desired_cnt):
                         recent_vals.append(angle)
                 else:
                     average_angle = sum(recent_vals) / len(recent_vals)
-                    recent_vals = []
+                    recent_vals.pop(0)
                     if valid_update:
                         valid_count += 1
                     if calibration['debug']:
