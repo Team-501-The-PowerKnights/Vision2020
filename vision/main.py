@@ -147,7 +147,8 @@ def run(cap, vision_table, calibration, freqFramesNT, desired_cnt):
                 angle, valid_update = FT.find_valids(
                     frame, calibration, desired_cnt)
                 # Checking for anomalies
-                print(recent_vals)
+                if calibration['debug']:
+                    print(recent_vals)
                 if len(recent_vals) != 5:
                     if angle != 1000:
                         recent_vals.append(angle)
