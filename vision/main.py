@@ -1,7 +1,8 @@
+import sys
+sys.path.append('/usr/local/lib/python3.7/site-packages')
 import cv2
 import time
 import os as OS
-import sys
 import logging
 import copy
 from util.config import run_config
