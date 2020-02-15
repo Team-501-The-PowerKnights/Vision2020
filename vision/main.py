@@ -156,19 +156,19 @@ def run(cap, vision_table, calibration, freqFramesNT, desired_cnt):
                 else:
                     average_angle = sum(recent_vals) / len(recent_vals)
                     recent_vals.pop(0)
-                    if valid_update:
-                        valid_count += 1
-                    if calibration['debug']:
-                        elapsed = timer_fv.get()
-                        print("DEBUG: find_valids took " + str(elapsed))
-                        print("DEBUG: angle: " + str(average_angle) + " valid_update: " +
-                              str(valid_update) + " valid_count: " + str(valid_count))
-                    if n > freqFramesNT:
-                        nt_send(vision_table, average_angle, valid_count,
-                                valid_update, heartbeat)
-                        n = 0
-                    else:
-                        n += 1
+                if valid_update:
+                    valid_count += 1
+                if calibration['debug']:
+                    elapsed = timer_fv.get()
+                    print("DEBUG: find_valids took " + str(elapsed))
+                    print("DEBUG: angle: " + str(average_angle) + " valid_update: " +
+                        str(valid_update) + " valid_count: " + str(valid_count))
+                if n > freqFramesNT:
+                    nt_send(vision_table, average_angle, valid_count,
+                            valid_update, heartbeat)
+                    n = 0
+                else:
+                    n += 1
             except:
                 print("WARNING: There was an error with find_valids. Continuing.")
                 continue
