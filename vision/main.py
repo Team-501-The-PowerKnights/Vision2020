@@ -11,11 +11,11 @@ from networktables import NetworkTables as NT
 import find_target as FT
 import socket
 import numpy as np
-import Image
+from PIL import Image
 import threading
-from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
-from SocketServer import ThreadingMixIn
-import StringIO
+from http.server import BaseHTTPRequestHandler,HTTPServer
+from socketserver import ThreadingMixIn
+from io import StringIO
 import time
 
 logging.basicConfig(level=logging.DEBUG)
