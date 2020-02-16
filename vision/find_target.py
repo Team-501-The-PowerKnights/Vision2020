@@ -20,6 +20,7 @@ def find_valids(img_orig, calibration, desired_cnt):
         [type] -- [description]
     """
     path = "/" + "/".join(os.getcwd().split("/")[1:3]) + "/test_images/"
+    print("path: " + path)
     debug = calibration['debug']
     search = calibration['search']
     angle = 1000
@@ -56,11 +57,11 @@ def find_valids(img_orig, calibration, desired_cnt):
     if debug:
         time = datetime.now().strftime("%s")
         cv2.imwrite(path +
-                    time+"image_orig.png", img_orig)
-        cv2.imwrite(path+time+"mask.png", mask)
-        cv2.imwrite(path+time+"mask.png", mask_thresh)
+                    time+"_image_orig.png", img_orig)
+        cv2.imwrite(path+time+"_mask.png", mask)
+        cv2.imwrite(path+time+"_mask.png", mask_thresh)
         cv2.imwrite(path+time +
-                    "erode_and_diliate.png", erode_and_diliate)
+                    "_erode_and_diliate.png", erode_and_diliate)
     if search:
         valid, cnt = VT.find_valid_target(mask_thresh, desired_cnt)
         if valid:
