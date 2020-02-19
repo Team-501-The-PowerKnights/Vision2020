@@ -27,40 +27,47 @@ os, camera_location, calibration, freqFramesNT, address = run_config(
 capture = None
 
 class CamHandler(BaseHTTPRequestHandler):
-	def do_GET(self):
-		if self.path.endswith('.mjpg'):
-			self.send_response(200)
-			self.send_header('Content-type','multipart/x-mixed-replace; boundary=--jpgboundary')
-			self.end_headers()
-			while True:
-				try:
-					if not ret:
-						continue
-					imgRGB=cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
-					jpg = Image.fromarray(imgRGB)
-					tmpFile = StringIO.StringIO()
-					jpg.save(tmpFile,'JPEG')
-					self.wfile.write("--jpgboundary")
-					self.send_header('Content-type','image/jpeg')
-					self.send_header('Content-length',str(tmpFile.len))
-					self.end_headers()
-					jpg.save(self.wfile,'JPEG')
-					time.sleep(0.05)
-				except KeyboardInterrupt:
-					break
-			return
-		if self.path.endswith('.html'):
-			self.send_response(200)
-			self.send_header('Content-type','text/html')
-			self.end_headers()
-			self.wfile.write('<html><head></head><body>')
-			self.wfile.write('<img src="http://127.0.0.1:8080/cam.mjpg"/>')
-			self.wfile.write('</body></html>')
-			return
+    def update_frame(self, frame):
+        self.frame = frame
+    def update_mask(self, mask):
+        self.mask = mask
+    def update_crosshairs(self, crosshairs):
+        self.crosshairs = crosshairs
+    def do_GET(self):
+        if self.path.endswith('.mjpg'):
+            self.send_response(200)
+            self.send_header('Content-type', 'multipart/x-mixed-replace; boundary=--jpgboundary')
+            self.end_headers()
+            while True:
+                try:
+                    ret, frame = capture.read()
+                    if not ret:
+                        continue
+                    r, img = cv2.imencode('.jpg', frame)
+                    if not r:
+                        continue
+                    jpg = img.tostring()
+                    self.wfile.write(str.encode("--jpgboundary"))
+                    self.send_header('Content-type', 'image/jpeg')
+                    self.send_header('Content-length', str(len(jpg)))
+                    self.end_headers()
+                    self.wfile.write(jpg)
+                    time.sleep(0.05)
+                except KeyboardInterrupt:
+                    break
+            return
+        if self.path.endswith('.html'):
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            self.wfile.write(str.encode('<html><head></head><body>'))
+            self.wfile.write(str.encode('<img src="http://127.0.0.1:8080/cam.mjpg"/>'))
+            self.wfile.write(str.encode('</body></html>'))
+            return
 
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
-	"""Handle requests in a separate thread."""
+    """Handle requests in a separate thread."""
 
 def main():
     """Main function for the program
@@ -79,7 +86,7 @@ def main():
     except KeyboardInterrupt:
         cap.release()
         server.socket.close()
-    run(cap, vision_table, calibration, freqFramesNT, desired_rect)
+    run(cap, vision_table, calibration, freqFramesNT, desired_rect, server)
 
 
 def nt_init(robot_address):
@@ -175,7 +182,7 @@ def cap_init(camera_location):
     return cap
 
 
-def run(cap, vision_table, calibration, freqFramesNT, desired_cnt):
+def run(cap, vision_table, calibration, freqFramesNT, desired_cnt, server):
     """[summary]
 
     Arguments:
@@ -194,13 +201,17 @@ def run(cap, vision_table, calibration, freqFramesNT, desired_cnt):
         heartbeat += 1
         x += 1
         ret, frame = cap.read()
+        server.update_frame = frame
+        print(server.frame)
         if ret:
             try:
                 if calibration['debug']:
                     timer_fv = SW('FV')
                     timer_fv.start()
-                angle, valid_update = FT.find_valids(
+                angle, valid_update, crosshair, mask = FT.find_valids(
                     frame, calibration, desired_cnt)
+                server.update_crosshairs(crosshair)
+                server.update_mask(mask)
                 # Checking for anomalies
                 if calibration['debug']:
                     print(recent_vals)

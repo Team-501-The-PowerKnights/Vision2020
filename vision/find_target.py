@@ -61,6 +61,8 @@ def find_valids(img_orig, calibration, desired_cnt):
         cv2.imwrite(path+time+"mask.png", mask_thresh)
         cv2.imwrite(path+time +
                     "erode_and_diliate.png", erode_and_diliate)
+    crosshairs = MI.drawCrossHairs(img_orig)
+
     if search:
         valid, cnt = VT.find_valid_target(mask_thresh, desired_cnt)
         if valid:
@@ -72,4 +74,4 @@ def find_valids(img_orig, calibration, desired_cnt):
                 cv2.imwrite(path +
                             time + "target_lined.png", line_img)
             angle = IC.findAngle(img_orig, cx)
-    return angle, valid_update
+    return angle, valid_update, crosshairs, mask_thresh
