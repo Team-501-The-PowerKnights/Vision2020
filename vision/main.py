@@ -27,12 +27,6 @@ os, camera_location, calibration, freqFramesNT, address = run_config(
 capture = None
 
 class CamHandler(BaseHTTPRequestHandler):
-    def update_frame(self, frame):
-        self.frame = frame
-    def update_mask(self, mask):
-        self.mask = mask
-    def update_crosshairs(self, crosshairs):
-        self.crosshairs = crosshairs
     def do_GET(self):
         if self.path.endswith('.mjpg'):
             self.send_response(200)
@@ -63,7 +57,6 @@ class CamHandler(BaseHTTPRequestHandler):
             self.wfile.write(str.encode('<img src="http://127.0.0.1:8080/cam.mjpg"/>'))
             self.wfile.write(str.encode('</body></html>'))
             return
-
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     """Handle requests in a separate thread."""
