@@ -40,7 +40,6 @@ class CamHandler(BaseHTTPRequestHandler):
             self.end_headers()
             while True:
                 try:
-                    ret, frame = capture.read()
                     if not ret:
                         continue
                     r, img = cv2.imencode('.jpg', frame)
