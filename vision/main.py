@@ -192,6 +192,8 @@ def run(cap, vision_table, calibration, freqFramesNT, desired_cnt, server):
     while cap.isOpened():
         heartbeat += 1
         x += 1
+        global frame
+        global ret
         ret, frame = cap.read()
         server.update_frame = frame
         print(server.frame)
