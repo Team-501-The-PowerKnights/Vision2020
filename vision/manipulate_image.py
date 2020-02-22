@@ -54,9 +54,9 @@ def drawCrossHairs(img):
     """
     dimensions = img.shape
     centery = int(dimensions[0] / 2)
-    print(centery)
+    # print(centery)
     centerx = int(dimensions[1] / 2)
-    print(centerx)
+    # print(centerx)
     centerx10 = centerx + 10
     centerx30 = centerx + 30
     centerxmin10 = centerx - 10

@@ -17,6 +17,7 @@ from http.server import BaseHTTPRequestHandler,HTTPServer
 from socketserver import ThreadingMixIn
 from io import StringIO
 import time
+import redis
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -28,38 +29,43 @@ capture = None
 
 class CamHandler(BaseHTTPRequestHandler):
     def do_GET(self):
+        r = redis.Redis()
         if self.path.endswith('.mjpg'):
             self.send_response(200)
             self.send_header('Content-type', 'multipart/x-mixed-replace; boundary=--jpgboundary')
             self.end_headers()
+            last = None
             while True:
-                try:
-                    if not ret:
-                        continue
-                    r, img = cv2.imencode('.jpg', frame)
-                    if not r:
-                        continue
-                    jpg = img.tostring()
+                frame = r.get('frame')
+                print("camh - length of frame bytes:" + str(len(frame)))
+                if frame != last:
+                    # print("new? image")
+                    maybe = np.frombuffer(frame, dtype=np.uint8) #     .reshape(480, 640, 3)
+                    decoded = cv2.imdecode(maybe, 1)
+                    print("camh - shape of decoded image: " + str(decoded.shape))
+                    jpg = decoded.tostring()
                     self.wfile.write(str.encode("--jpgboundary"))
                     self.send_header('Content-type', 'image/jpeg')
                     self.send_header('Content-length', str(len(jpg)))
                     self.end_headers()
                     self.wfile.write(jpg)
-                    time.sleep(0.05)
-                except KeyboardInterrupt:
-                    break
+                    last = frame
+                # else:
+                #     print("same image")
             return
         if self.path.endswith('.html'):
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
             self.wfile.write(str.encode('<html><head></head><body>'))
-            self.wfile.write(str.encode('<img src="http://127.0.0.1:8080/cam.mjpg"/>'))
+            self.wfile.write(str.encode('<img src="http://raspberrypi.local:1180/cam.mjpg"/>'))
             self.wfile.write(str.encode('</body></html>'))
             return
 
+
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     """Handle requests in a separate thread."""
+
 
 def main():
     """Main function for the program
@@ -67,18 +73,39 @@ def main():
     vision_table = nt_init(address)
     cap = cap_init(camera_location)
     desired_rect = create_rect()
-    global frame
-    global ret
-    ret = 0
-    frame = []
-    try:
-        server = ThreadedHTTPServer(('127.0.0.1', 1180), CamHandler)
-        print("server started")
-        server.serve_forever()
-    except KeyboardInterrupt:
-        cap.release()
-        server.socket.close()
-    run(cap, vision_table, calibration, freqFramesNT, desired_rect, server)
+    server = ThreadedHTTPServer(('0.0.0.0', 1180), CamHandler)
+    print("INFO: streaming server started")
+    thread = threading.Thread(target=server.serve_forever)
+    thread.daemon = True
+    thread.start()
+    r = send_to_redis()
+    thread2 = threading.Thread(target=r.process)
+    thread2.daemon = True
+    thread2.start()
+    run(cap, vision_table, calibration, freqFramesNT, desired_rect, r)
+
+
+class send_to_redis:
+    def __init__(self):
+        self.r = redis.Redis()
+        self.frame = None
+        self.stopped = False
+
+    def update(self, img):
+        self.frame = img
+
+    def process(self):
+        while not self.stopped:
+            if self.frame is not None:
+                shape = self.frame.shape
+                print("send - frame array shape: " + str(shape))
+                _, jpeg = cv2.imencode('.JPEG', self.frame)
+                h, w = jpeg.shape
+                print("send - jpeg size: " + str(h) + " x " + str (w))
+                jpg_bytes = jpeg.tobytes()
+                # print("length of sent image: " + str(len(jpg_bytes)))
+                self.r.set('frame', jpg_bytes)
+            self.frame = None
 
 
 def nt_init(robot_address):
@@ -174,7 +201,7 @@ def cap_init(camera_location):
     return cap
 
 
-def run(cap, vision_table, calibration, freqFramesNT, desired_cnt, server):
+def run(cap, vision_table, calibration, freqFramesNT, desired_cnt, redis):
     """[summary]
 
     Arguments:
@@ -192,24 +219,20 @@ def run(cap, vision_table, calibration, freqFramesNT, desired_cnt, server):
     while cap.isOpened():
         heartbeat += 1
         x += 1
-        global frame
-        global ret
         ret, frame = cap.read()
-        server.update_frame = frame
-        print(server.frame)
         if ret:
+            redis.update(frame)
             try:
                 if calibration['debug']:
                     timer_fv = SW('FV')
                     timer_fv.start()
                 angle, valid_update, crosshair, mask = FT.find_valids(
                     frame, calibration, desired_cnt)
-                server.update_crosshairs(crosshair)
-                server.update_mask(mask)
                 # Checking for anomalies
                 if calibration['debug']:
                     print(recent_vals)
                 if len(recent_vals) != 5:
+                    average_angle = 0 #  TAKE THIS OUT
                     if angle != 1000:
                         recent_vals.append(angle)
                 else:
@@ -228,8 +251,8 @@ def run(cap, vision_table, calibration, freqFramesNT, desired_cnt, server):
                     n = 0
                 else:
                     n += 1
-            except:
-                print("WARNING: There was an error with find_valids. Continuing.")
+            except Exception as e:
+                print("WARNING: Exception: " + str(e))
                 continue
         else:
             print("WARNING: Unable to read frame. Continuing.")
