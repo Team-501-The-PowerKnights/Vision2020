@@ -31,5 +31,5 @@ ylabel('Distance to Target (in)')
 % ylabel('Distance to Target (in)')
 
 %% test an individual point
-% estimated_distance = polyfit(p, new_angle)
+% estimated_distance = polyval(p, new_angle)
 % error = actual_distance - estimated_distance
