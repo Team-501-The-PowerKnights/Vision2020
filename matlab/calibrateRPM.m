@@ -14,10 +14,10 @@ p = polyfit(dist, rpm, 2);
 y_fit = polyval(p, dist);
 plot(dist, rpm, '*b');
 hold on
-plot(y_fit, rpm, 'r--');
+plot(dist, y_fit, 'r--');
 title('Quadratic Fit')
-xlabel('Y Offset rpm (deg)')
-ylabel('Distance to Target (in)')
+xlabel('Distance (in)')
+ylabel('RPM')
 
 %% linear
 % figure;
@@ -25,11 +25,11 @@ ylabel('Distance to Target (in)')
 % y_fit = polyval(p, dist);
 % plot(dist, rpm, '*b');
 % hold on
-% plot(y_fit, rpm, 'r--');
+% plot(dist, y_fit, 'r--');
 % title('Linear Fit')
-% xlabel('Y Offset rpm (deg)')
-% ylabel('Distance to Target (in)')
+% xlabel('Distance (in)')
+% ylabel('RPM')
 
 %% test an individual point
-% estimated_distance = polyval(p, new_dist)
-% error = actual_distance - estimated_distance
+% estimated_rpm = polyval(p, new_dist)
+% error = actual_rpm - estimated_rpm
