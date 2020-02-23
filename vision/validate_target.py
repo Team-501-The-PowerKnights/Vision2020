@@ -24,6 +24,8 @@ def isValidShape(contour, desired_cnt):
         desired_cnt[0], contour[0], 3, 0.0)
     matches = [match_quality1, match_quality2, match_quality3]
     match_quality = min(matches)
+    match_index = matches.index(min(matches))
+    print("match index: " + str(match_index))
     if match_quality < match_threshold:
         return True
     else:

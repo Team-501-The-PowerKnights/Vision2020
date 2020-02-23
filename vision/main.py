@@ -143,35 +143,41 @@ def run(cap, vision_table, calibration, freqFramesNT, desired_cnt):
         if ret:
             try:
                 if calibration['debug']:
+                    print("DEBUG: heartbeat: " + str(heartbeat))
                     timer_fv = SW('FV')
                     timer_fv.start()
                 angle, valid_update = FT.find_valids(
                     frame, calibration, desired_cnt)
-                # Checking for anomalies
-                if calibration['debug']:
-                    print(recent_vals)
-                if len(recent_vals) != 5:
-                    if angle != 1000:
-                        recent_vals.append(angle)
-                else:
-                    average_angle = sum(recent_vals) / len(recent_vals)
-                    recent_vals.pop(0)
-                if valid_update:
-                    valid_count += 1
-                if calibration['debug']:
-                    elapsed = timer_fv.get()
-                    print("DEBUG: find_valids took " + str(elapsed))
-                    print("DEBUG: angle: " + str(average_angle) + " valid_update: " +
-                        str(valid_update) + " valid_count: " + str(valid_count))
-                if n > freqFramesNT:
-                    nt_send(vision_table, average_angle, valid_count,
-                            valid_update, heartbeat)
-                    n = 0
-                else:
-                    n += 1
-            except:
-                print("WARNING: There was an error with find_valids. Continuing.")
-                continue
+            except Exception as e:
+                print("WARNING: find_valids threw an exception: " + str(e))
+                angle = 9999
+                valid_update: False
+
+            # Checking for anomalies
+            if calibration['debug']:
+                print("DEBUG: recent_vals: " + str(recent_vals) + " last angle: " + str(angle))
+            if angle != 1000 and angle != 9999:  # do not append the angle if something blew up
+                recent_vals.append(angle)
+            if len(recent_vals) > 5:  # if the length of the recent_values is larger than 5, we want to make it 5
+                recent_vals.pop(0)
+            if len(recent_vals) > 0:  # if there is no angle data, we want to NOT divide by zero
+                average_angle = sum(recent_vals) / len(recent_vals)
+            else:
+                average_angle = 0  # set the average angle to something sane until we get some values
+            if valid_update:
+                valid_count += 1
+            if calibration['debug']:
+                elapsed = timer_fv.get()
+                print("DEBUG: find_valids took " + str(elapsed))
+                print("DEBUG: average_angle: " + str(average_angle) + " valid_update: " +
+                    str(valid_update) + " valid_count: " + str(valid_count))
+            if n > freqFramesNT:
+                nt_send(vision_table, average_angle, valid_count,
+                        valid_update, heartbeat)
+                n = 0
+            else:
+                n += 1
+
         else:
             print("WARNING: Unable to read frame. Continuing.")
             continue
